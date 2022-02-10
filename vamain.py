@@ -3,6 +3,8 @@ import speech_recognition as sr #pip install speechRecognition
 import datetime
 import wikipedia #pip install wikipedia
 import webbrowser
+import pyjokes
+import pywhatkit
 import os
 import smtplib
 
@@ -69,18 +71,26 @@ if __name__ == "__main__":
         elif 'open youtube' in query:
             webbrowser.open("youtube.com")
 
+        elif 'who is' in query:
+            person = query.replace('who the heck is', '')
+            info = wikipedia.summary(person, 1)
+            print(info)
+            speak(info)
+
         elif 'open google' in query:
             webbrowser.open("google.com")
 
         elif 'open stackoverflow' in query:
-            webbrowser.open("stackoverflow.com")   
+            webbrowser.open("stackoverflow.com")  
 
+        elif 'joke' in query:
+            speak(pyjokes.get_joke())
 
-        elif 'play music' in query:
-            music_dir = 'D:\\Non Critical\\songs\\Favorite Songs2'
-            songs = os.listdir(music_dir)
-            print(songs)    
-            os.startfile(os.path.join(music_dir, songs[0]))
+        elif 'play' in query:
+            song = query.replace('play', '')
+            speak('playing ' + song)
+            pywhatkit.playonyt(song) 
+
 
         elif 'the time' in query:
             strTime = datetime.datetime.now().strftime("%H:%M:%S")    
