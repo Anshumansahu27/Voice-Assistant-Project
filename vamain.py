@@ -7,6 +7,8 @@ import pyjokes
 import pywhatkit
 import os
 import smtplib
+from bs4 import BeautifulSoup
+import requests
 
 engine = pyttsx3.init('sapi5')
 voices = engine.getProperty('voices')
@@ -89,7 +91,12 @@ if __name__ == "__main__":
         elif 'play' in query:
             song = query.replace('play', '')
             speak('playing ' + song)
-            pywhatkit.playonyt(song) 
+            pywhatkit.playonyt(song)
+
+        elif 'search' in query:
+            topic = query.replace('search', '')
+            speak('searching ' + topic)
+            pywhatkit.search(topic)
 
 
         elif 'the time' in query:
@@ -97,27 +104,38 @@ if __name__ == "__main__":
             speak(f"Sir, the time is {strTime}")
             print(strTime)
 
+        elif 'exit' in query:
+            speak("Thanks for giving me your time")
+            exit()
+
+
         elif 'weather' in query:
+
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+ 
+ 
+            def weather(city):
+                city = city.replace(" ", "+")
+                res = requests.get(
+                    f'https://www.google.com/search?q={city}&oq={city}&aqs=chrome.0.35i39l2j0l4j46j69i60.6128j1j7&sourceid=chrome&ie=UTF-8', headers=headers)
+                print("Searching...\n")
+                soup = BeautifulSoup(res.text, 'html.parser')
+                location = soup.select('#wob_loc')[0].getText().strip()
+                time = soup.select('#wob_dts')[0].getText().strip()
+                info = soup.select('#wob_dc')[0].getText().strip()
+                weather = soup.select('#wob_tm')[0].getText().strip()
+                print(location)
+                speak(location)
+                print(time)
+                speak(time)
+                print(info)
+                speak(info)
+                print(weather+"°C")
+                speak(weather+"degree celcius")
             
-            api_key = '87d845b0b6cf29baa1a73cc34b067a95'
-            location = input("Enter the city name: ")
-
-            complete_api_link = "https://api.openweathermap.org/data/2.5/weather?q="+location+"&appid="+api_key
-            api_link = requests.get(complete_api_link)
-            api_data = api_link.json()
-
-            #create variables to store and display data
-            temp_city = ((api_data['main']['temp']) - 273.15)
-            weather_desc = api_data['weather'][0]['description']
-            hmdt = api_data['main']['humidity']
-            wind_spd = api_data['wind']['speed']
-            date_time = datetime.now().strftime("%d %b %Y | %I:%M:%S %p")
-
-            print ("-------------------------------------------------------------")
-            print ("Weather Stats for - {}  || {}".format(location.upper(), date_time))
-            print ("-------------------------------------------------------------")
-
-            print ("Current temperature is: {:.2f} deg C".format(temp_city))
-            print ("Current weather desc  :",weather_desc)
-            print ("Current Humidity      :",hmdt, '%')
-            print ("Current wind speed    :",wind_spd ,'kmph')
+            place = query.replace('weather', '')
+            city = place
+            city = city+" weather"
+            weather(city)
+            print("Have a Nice Day:)")
+        
